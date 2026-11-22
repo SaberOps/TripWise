@@ -1,0 +1,18 @@
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+}
+
+.page-content {
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
+}

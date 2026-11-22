@@ -1,0 +1,40 @@
+
+<aside class="sidebar">
+  <div class="menu-section">
+    <p class="section-title">MAIN MENU</p>
+
+    <a routerLink="/home" routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }" class="menu-item">
+      <span>⌂</span> Dashboard
+    </a>
+
+    <a routerLink="/destinations" routerLinkActive="active"
+       class="menu-item">
+      <span>◎</span> Explore Destinations
+    </a>
+
+    <a routerLink="/trips" routerLinkActive="active"
+       class="menu-item">
+      <span>▣</span> My Trips
+    </a>
+
+    <a routerLink="/favorites" routerLinkActive="active"
+       class="menu-item">
+      <span>♡</span> Favorites
+    </a>
+
+    <a routerLink="/budget" routerLinkActive="active"
+       class="menu-item">
+      <span>◈</span> Budget Planner
+    </a>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="travel-tip">
+      <span class="tip-icon">✦</span>
+      <strong>Travel tip</strong>
+      <p>Great journeys begin with a little planning.</p>
+    </div>
+  </div>
+</aside>
+
