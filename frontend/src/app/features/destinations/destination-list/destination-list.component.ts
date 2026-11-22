@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Destination } from '../../../core/models/destination.model';
 import { DestinationService } from '../../../core/services/destination.service';
+import { FavoritesService } from '../../../core/services/favorites.service';
 
 @Component({
   selector: 'app-destination-list',
@@ -13,6 +14,15 @@ import { DestinationService } from '../../../core/services/destination.service';
 export class DestinationListComponent {
 
   private readonly destinationService = inject(DestinationService);
+  private readonly favoritesService = inject(FavoritesService);
+
+isFavorite(id: number): boolean {
+  return this.favoritesService.isFavorite(id);
+}
+
+toggleFavorite(id: number): void {
+  this.favoritesService.toggleFavorite(id);
+}
 
   searchTerm = '';
   selectedCategory = 'All';

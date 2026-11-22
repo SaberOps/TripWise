@@ -280,3 +280,24 @@
     width: 100%;
   }
 }
+
+.favorite-button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  color: #64748b;
+  font-size: 23px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.favorite-button:hover,
+.favorite-button.active {
+  color: #e11d48;
+  transform: scale(1.08);
+}

@@ -1,1 +1,95 @@
-<p>favorites works!</p>
+
+<div class="favorites-page">
+
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">YOUR PERSONAL COLLECTION</p>
+      <h1>My Favorites</h1>
+      <p class="subtitle">
+        All the destinations you love, in one place.
+      </p>
+    </div>
+
+    <div class="favorites-count">
+      <strong>{{ favorites.length }}</strong>
+      <span>Saved destinations</span>
+    </div>
+  </section>
+
+  @if (favorites.length > 0) {
+
+    <section class="favorites-grid">
+
+      @for (destination of favorites; track destination.id) {
+
+        <article class="favorite-card">
+
+          <div class="favorite-image">
+            <img
+              [src]="destination.imageUrl"
+              [alt]="destination.name"
+            />
+
+            <button
+              class="remove-button"
+              (click)="removeFavorite(destination.id)"
+              [attr.aria-label]="'Remove ' + destination.name + ' from favorites'"
+              title="Remove from favorites"
+            >
+              ♥
+            </button>
+          </div>
+
+          <div class="favorite-content">
+
+            <span class="category">{{ destination.category }}</span>
+
+            <p class="country">📍 {{ destination.country }}</p>
+
+            <h2>{{ destination.name }}</h2>
+
+            <p class="description">
+              {{ destination.description }}
+            </p>
+
+            <div class="card-footer">
+              <div>
+                <small>Estimated budget</small>
+                <strong>${{ destination.estimatedBudget }}</strong>
+              </div>
+
+              <a
+                [routerLink]="['/destinations', destination.id]"
+                class="details-button"
+              >
+                View details →
+              </a>
+            </div>
+
+          </div>
+
+        </article>
+
+      }
+
+    </section>
+
+  } @else {
+
+    <section class="empty-state">
+      <div class="empty-icon">♡</div>
+      <h2>No favorites yet</h2>
+      <p>
+        You haven't saved any destinations. Explore the world
+        and add your favorite places here.
+      </p>
+
+      <a routerLink="/destinations" class="explore-button">
+        Explore destinations →
+      </a>
+    </section>
+
+  }
+
+</div>
+

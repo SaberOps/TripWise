@@ -6,6 +6,7 @@ import { DestinationListComponent } from './features/destinations/destination-li
 import { TripListComponent } from './features/trips/trip-list/trip-list.component';
 import { FavoritesComponent } from './features/favorites/favorites/favorites.component';
 import { BudgetComponent } from './features/budget/budget/budget.component';
+import { FavoritesComponent } from './features/favorites/favorites/favorites.component';
 
 export const routes: Routes = [
   {
