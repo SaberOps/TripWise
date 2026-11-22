@@ -1,0 +1,46 @@
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Angular
+.angular/
+dist/
+coverage/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Build files
+build/
+out/
+
+# Temporary files
+tmp/
+temp/
+
+# Test and cache files
+.nyc_output/
+.cache/
+
+# Generated reports
+*.tmp
+#presentation and report
+presentation/
+report/
