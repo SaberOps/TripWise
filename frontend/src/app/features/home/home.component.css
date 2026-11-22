@@ -321,3 +321,40 @@
     padding: 15px;
   }
 }
+
+.empty-trips {
+  background: white;
+  border: 1px dashed #cbd5e1;
+  border-radius: 11px;
+  padding: 25px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.empty-trips p {
+  color: #0f2942;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.empty-trips span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.trip-status {
+  text-transform: capitalize;
+}
+
+@media (max-width: 650px) {
+  .trip-card {
+    flex-wrap: wrap;
+  }
+
+  .trip-status {
+    margin-left: 57px;
+  }
+}
+

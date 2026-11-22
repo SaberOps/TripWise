@@ -5,7 +5,7 @@
   <section class="welcome-section">
     <div>
       <p class="welcome-label">YOUR TRAVEL DASHBOARD</p>
-      <h1>Welcome back, Saber! 👋</h1>
+      <h1>Welcome to TripWise! ✈</h1>
       <p class="welcome-description">
         Ready for your next adventure? Let's explore the world.
       </p>
@@ -18,9 +18,9 @@
 
   <!-- Statistics -->
   <section class="stats-grid">
-    @for (stat of stats; track stat.title) {
+    @for (stat of stats(); track stat.title) {
       <article class="stat-card">
-        <div class="stat-icon" [class]="stat.color">
+        <div class="stat-icon" [ngClass]="stat.color">
           {{ stat.icon }}
         </div>
 
@@ -33,7 +33,7 @@
     }
   </section>
 
-  <!-- Destinations -->
+  <!-- Popular Destinations -->
   <section class="content-section">
     <div class="section-header">
       <div>
@@ -47,25 +47,39 @@
     </div>
 
     <div class="destination-grid">
-      @for (destination of destinations; track destination.name) {
+      @for (destination of destinations(); track destination.id) {
         <article class="destination-card">
 
           <div class="destination-image">
-            <img [src]="destination.image"
-                 [alt]="destination.name">
+            <img
+              [src]="destination.imageUrl"
+              [alt]="destination.name"
+            />
 
-            <span class="rating">★ {{ destination.rating }}</span>
+            <span class="rating">
+              ★ {{ destination.rating }}
+            </span>
           </div>
 
           <div class="destination-info">
-            <span class="category">{{ destination.category }}</span>
+            <span class="category">
+              {{ destination.category }}
+            </span>
 
             <h3>{{ destination.name }}</h3>
             <p class="country">📍 {{ destination.country }}</p>
 
             <div class="destination-footer">
-              <span>From <strong>{{ destination.price }}</strong></span>
-              <a routerLink="/destinations">Explore →</a>
+              <span>
+                From
+                <strong>
+                  {{ destination.estimatedBudget | currency:'USD':'symbol':'1.0-0' }}
+                </strong>
+              </span>
+
+              <a [routerLink]="['/destinations', destination.id]">
+                Explore →
+              </a>
             </div>
           </div>
 
@@ -88,24 +102,36 @@
     </div>
 
     <div class="trips-list">
-      @for (trip of upcomingTrips; track trip.destination) {
+
+      @for (trip of upcomingTrips(); track trip.id) {
         <article class="trip-card">
           <div class="trip-icon">✈</div>
 
           <div class="trip-details">
             <h3>{{ trip.destination }}</h3>
-            <p>{{ trip.date }} · {{ trip.duration }}</p>
+            <p>{{ trip.date | date:'dd MMMM yyyy' }}</p>
           </div>
 
-          <span class="trip-status">{{ trip.status }}</span>
+          <span class="trip-status">
+            {{ trip.status }}
+          </span>
         </article>
       }
+
+      @if (upcomingTrips().length === 0) {
+        <div class="empty-trips">
+          <p>No upcoming trips yet.</p>
+          <span>Start planning your next adventure!</span>
+        </div>
+      }
+
     </div>
 
-    <a routerLink="/trips" class="secondary-button">
+    <a routerLink="/trips/new" class="secondary-button">
       + Plan a New Trip
     </a>
   </section>
 
 </div>
+
 

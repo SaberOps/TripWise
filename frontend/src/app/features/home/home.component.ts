@@ -1,87 +1,85 @@
 
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+
+import { DestinationService } from '../../core/services/destination.service';
+import { TripService } from '../../core/services/trip.service';
+import { FavoritesService } from '../../core/services/favorites.service';
+import { BudgetService } from '../../core/services/budget.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  private readonly destinationService = inject(DestinationService);
+  private readonly tripService = inject(TripService);
+  private readonly favoritesService = inject(FavoritesService);
+  private readonly budgetService = inject(BudgetService);
 
-  stats = [
+  readonly destinations = computed(() =>
+    this.destinationService.getAll().slice(0, 3)
+  );
+
+  readonly stats = computed(() => [
     {
       title: 'Total Trips',
-      value: '12',
+      value: String(this.tripService.tripsList().length),
       icon: '✈',
       description: 'Trips planned',
       color: 'teal'
     },
     {
-      title: 'Countries Visited',
-      value: '08',
-      icon: '🌍',
-      description: 'Amazing countries',
+      title: 'Destinations',
+      value: String(this.destinationService.getAll().length),
+      icon: '◎',
+      description: 'Places to explore',
       color: 'blue'
     },
     {
       title: 'Favorite Places',
-      value: '15',
+      value: String(this.favoritesService.getFavorites().length),
       icon: '♡',
       description: 'Saved destinations',
       color: 'orange'
     },
     {
       title: 'Total Budget',
-      value: '$4,250',
-      icon: '◈',
-      description: 'Travel budget',
+      value: this.budgetService.summary().totalBudget.toLocaleString(
+        'en-US',
+        { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }
+      ),
+      icon: '$',
+      description: 'Budget across your trips',
       color: 'purple'
     }
-  ];
+  ]);
 
-  destinations = [
-    {
-      name: 'Santorini',
-      country: 'Greece',
-      category: 'Island',
-      price: '$850',
-      rating: '4.9',
-      image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800'
-    },
-    {
-      name: 'Bali',
-      country: 'Indonesia',
-      category: 'Beach',
-      price: '$720',
-      rating: '4.8',
-      image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800'
-    },
-    {
-      name: 'Swiss Alps',
-      country: 'Switzerland',
-      category: 'Mountain',
-      price: '$1,200',
-      rating: '4.9',
-      image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800'
-    }
-  ];
+  readonly upcomingTrips = computed(() =>
+    this.tripService.tripsList()
+      .filter(trip => trip.status === 'Planned')
+      .slice()
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .slice(0, 3)
+      .map(trip => {
+        const destination = this.destinationService.getById(
+          trip.destinationId
+        );
 
-  upcomingTrips = [
-    {
-      destination: 'Paris, France',
-      date: '15 December 2026',
-      duration: '5 days',
-      status: 'Planned'
-    },
-    {
-      destination: 'Rome, Italy',
-      date: '10 January 2027',
-      duration: '7 days',
-      status: 'Planned'
-    }
-  ];
+        return {
+          id: trip.id,
+          destination: destination
+            ? `${destination.name}, ${destination.country}`
+            : trip.title,
+          date: trip.startDate,
+          status: trip.status
+        };
+      })
+  );
 }
+
 
