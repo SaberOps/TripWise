@@ -4,9 +4,9 @@ import { DestinationDetailsComponent } from './features/destinations/destination
 import { HomeComponent } from './features/home/home.component';
 import { DestinationListComponent } from './features/destinations/destination-list/destination-list.component';
 import { TripListComponent } from './features/trips/trip-list/trip-list.component';
+import { TripFormComponent } from './features/trips/trip-form/trip-form.component';
 import { FavoritesComponent } from './features/favorites/favorites/favorites.component';
 import { BudgetComponent } from './features/budget/budget/budget.component';
-import { FavoritesComponent } from './features/favorites/favorites/favorites.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +28,17 @@ export const routes: Routes = [
     path: 'trips',
     component: TripListComponent,
     title: 'TripWise | My Trips'
+  },
+  {
+    path: 'trips/new',
+    component: TripFormComponent,
+    title: 'TripWise | Plan a Trip'
+  },
+  {
+    path: 'trips/:id/edit',
+    component: TripFormComponent,
+    title: 'TripWise | Edit Trip'
+
   },
   {
     path: 'favorites',
