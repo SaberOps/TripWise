@@ -1,3 +1,45 @@
+
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { HomeComponent } from './features/home/home.component';
+import { DestinationListComponent } from './features/destinations/destination-list/destination-list.component';
+import { TripListComponent } from './features/trips/trip-list/trip-list.component';
+import { FavoritesComponent } from './features/favorites/favorites/favorites.component';
+import { BudgetComponent } from './features/budget/budget/budget.component';
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    title: 'TripWise | Home'
+  },
+  {
+    path: 'destinations',
+    component: DestinationListComponent,
+    title: 'TripWise | Destinations'
+  },
+  {
+    path: 'trips',
+    component: TripListComponent,
+    title: 'TripWise | My Trips'
+  },
+  {
+    path: 'favorites',
+    component: FavoritesComponent,
+    title: 'TripWise | Favorites'
+  },
+  {
+    path: 'budget',
+    component: BudgetComponent,
+    title: 'TripWise | Budget'
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
+  }
+];
