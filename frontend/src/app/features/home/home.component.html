@@ -1,1 +1,111 @@
-<p>home works!</p>
+
+<div class="dashboard">
+
+  <!-- Welcome Section -->
+  <section class="welcome-section">
+    <div>
+      <p class="welcome-label">YOUR TRAVEL DASHBOARD</p>
+      <h1>Welcome back, Saber! 👋</h1>
+      <p class="welcome-description">
+        Ready for your next adventure? Let's explore the world.
+      </p>
+    </div>
+
+    <a routerLink="/destinations" class="primary-button">
+      Explore Destinations →
+    </a>
+  </section>
+
+  <!-- Statistics -->
+  <section class="stats-grid">
+    @for (stat of stats; track stat.title) {
+      <article class="stat-card">
+        <div class="stat-icon" [class]="stat.color">
+          {{ stat.icon }}
+        </div>
+
+        <div>
+          <p class="stat-title">{{ stat.title }}</p>
+          <h2>{{ stat.value }}</h2>
+          <p class="stat-description">{{ stat.description }}</p>
+        </div>
+      </article>
+    }
+  </section>
+
+  <!-- Destinations -->
+  <section class="content-section">
+    <div class="section-header">
+      <div>
+        <h2>Popular Destinations</h2>
+        <p>Discover places worth visiting</p>
+      </div>
+
+      <a routerLink="/destinations" class="view-link">
+        View all →
+      </a>
+    </div>
+
+    <div class="destination-grid">
+      @for (destination of destinations; track destination.name) {
+        <article class="destination-card">
+
+          <div class="destination-image">
+            <img [src]="destination.image"
+                 [alt]="destination.name">
+
+            <span class="rating">★ {{ destination.rating }}</span>
+          </div>
+
+          <div class="destination-info">
+            <span class="category">{{ destination.category }}</span>
+
+            <h3>{{ destination.name }}</h3>
+            <p class="country">📍 {{ destination.country }}</p>
+
+            <div class="destination-footer">
+              <span>From <strong>{{ destination.price }}</strong></span>
+              <a routerLink="/destinations">Explore →</a>
+            </div>
+          </div>
+
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Upcoming Trips -->
+  <section class="content-section">
+    <div class="section-header">
+      <div>
+        <h2>Upcoming Trips</h2>
+        <p>Your next adventures are waiting</p>
+      </div>
+
+      <a routerLink="/trips" class="view-link">
+        View all →
+      </a>
+    </div>
+
+    <div class="trips-list">
+      @for (trip of upcomingTrips; track trip.destination) {
+        <article class="trip-card">
+          <div class="trip-icon">✈</div>
+
+          <div class="trip-details">
+            <h3>{{ trip.destination }}</h3>
+            <p>{{ trip.date }} · {{ trip.duration }}</p>
+          </div>
+
+          <span class="trip-status">{{ trip.status }}</span>
+        </article>
+      }
+    </div>
+
+    <a routerLink="/trips" class="secondary-button">
+      + Plan a New Trip
+    </a>
+  </section>
+
+</div>
+
