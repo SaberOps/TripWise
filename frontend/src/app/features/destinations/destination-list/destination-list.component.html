@@ -1,1 +1,115 @@
-<p>destination-list works!</p>
+
+<div class="destinations-page">
+
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">DISCOVER THE WORLD</p>
+      <h1>Explore Destinations</h1>
+      <p class="subtitle">
+        Find your next adventure and discover amazing places around the world.
+      </p>
+    </div>
+
+    <div class="destination-count">
+      <strong>{{ filteredDestinations.length }}</strong>
+      <span>Destinations found</span>
+    </div>
+  </section>
+
+  <section class="filters">
+
+    <div class="search-field">
+      <span>⌕</span>
+      <input
+        type="text"
+        placeholder="Search by destination or country..."
+        [value]="searchTerm"
+        (input)="onSearch($event)"
+      />
+    </div>
+
+    <select
+      [value]="selectedCategory"
+      (change)="onCategoryChange($event)"
+      aria-label="Filter by category"
+    >
+      @for (category of categories; track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+
+    <button class="clear-button" (click)="clearFilters()">
+      Clear filters
+    </button>
+
+  </section>
+
+  <section class="destination-grid">
+
+    @for (destination of filteredDestinations; track destination.id) {
+
+      <article class="destination-card">
+
+        <div class="destination-image">
+          <img
+            [src]="destination.imageUrl"
+            [alt]="destination.name"
+          />
+
+          <span class="category-badge">
+            {{ destination.category }}
+          </span>
+
+          <span class="rating">
+            ★ {{ destination.rating }}
+          </span>
+        </div>
+
+        <div class="destination-content">
+
+          <p class="country">📍 {{ destination.country }}</p>
+
+          <h2>{{ destination.name }}</h2>
+
+          <p class="description">
+            {{ destination.description }}
+          </p>
+
+          <div class="card-footer">
+
+            <div class="budget">
+              <small>Estimated budget</small>
+              <strong>${{ destination.estimatedBudget }}</strong>
+            </div>
+
+            <a
+              [routerLink]="['/destinations', destination.id]"
+              class="details-button"
+            >
+              View details →
+            </a>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    } @empty {
+
+      <div class="empty-state">
+        <div class="empty-icon">🌍</div>
+        <h2>No destinations found</h2>
+        <p>Try changing your search or category filter.</p>
+
+        <button class="clear-button" (click)="clearFilters()">
+          Reset filters
+        </button>
+      </div>
+
+    }
+
+  </section>
+
+</div>
+
