@@ -1,1 +1,103 @@
-<p>trip-list works!</p>
+
+<div class="trips-page">
+
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">YOUR TRAVEL PLANS</p>
+      <h1>My Trips</h1>
+      <p class="subtitle">
+        Organize and manage all your upcoming adventures.
+      </p>
+    </div>
+
+    <a routerLink="/trips/new" class="add-trip-button">
+      + Plan a New Trip
+    </a>
+  </section>
+
+  @if (trips().length > 0) {
+
+    <section class="trips-grid">
+
+      @for (trip of trips(); track trip.id) {
+
+        <article class="trip-card">
+
+          <div class="trip-card-header">
+            <span class="status" [class]="trip.status.toLowerCase()">
+              {{ trip.status }}
+            </span>
+
+            <span class="trip-id">#{{ trip.id }}</span>
+          </div>
+
+          <h2>{{ trip.title }}</h2>
+
+          <p class="destination">
+            📍 {{ getDestinationName(trip.destinationId) }}
+          </p>
+
+          <div class="trip-info">
+            <div>
+              <span>Start date</span>
+              <strong>{{ trip.startDate }}</strong>
+            </div>
+
+            <div>
+              <span>End date</span>
+              <strong>{{ trip.endDate }}</strong>
+            </div>
+
+            <div>
+              <span>Budget</span>
+              <strong>${{ trip.budget }}</strong>
+            </div>
+
+            <div>
+              <span>Travelers</span>
+              <strong>{{ trip.travelers }}</strong>
+            </div>
+          </div>
+
+          @if (trip.notes) {
+            <p class="notes">{{ trip.notes }}</p>
+          }
+
+          <div class="trip-actions">
+            <a
+              [routerLink]="['/trips/edit', trip.id]"
+              class="edit-button"
+            >
+              Edit
+            </a>
+
+            <button
+              class="delete-button"
+              (click)="deleteTrip(trip.id)"
+            >
+              Delete
+            </button>
+          </div>
+
+        </article>
+
+      }
+
+    </section>
+
+  } @else {
+
+    <section class="empty-state">
+      <div class="empty-icon">✈</div>
+      <h2>No trips planned yet</h2>
+      <p>Start planning your next adventure!</p>
+
+      <a routerLink="/trips/new" class="add-trip-button">
+        Create your first trip
+      </a>
+    </section>
+
+  }
+
+</div>
+
