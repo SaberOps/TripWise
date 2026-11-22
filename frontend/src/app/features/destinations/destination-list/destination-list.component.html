@@ -55,6 +55,17 @@
             [src]="destination.imageUrl"
             [alt]="destination.name"
           />
+          <button
+  class="favorite-button"
+  [class.active]="isFavorite(destination.id)"
+  (click)="toggleFavorite(destination.id)"
+  [attr.aria-label]="isFavorite(destination.id)
+    ? 'Remove from favorites'
+    : 'Add to favorites'"
+  title="Toggle favorite"
+>
+  {{ isFavorite(destination.id) ? '♥' : '♡' }}
+</button>
 
           <span class="category-badge">
             {{ destination.category }}
