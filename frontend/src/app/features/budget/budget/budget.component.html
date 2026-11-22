@@ -1,1 +1,130 @@
-<p>budget works!</p>
+
+<section class="budget-page">
+
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">FINANCIAL OVERVIEW</span>
+      <h1>Budget Management</h1>
+      <p>Track your travel expenses and keep your trips within budget.</p>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-grid">
+
+    <article class="summary-card">
+      <div class="card-icon blue">💰</div>
+      <p>Total Budget</p>
+      <h2>{{ budgetService.summary().totalBudget | currency:'USD' }}</h2>
+      <span>Across all your trips</span>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon orange">💳</div>
+      <p>Total Spent</p>
+      <h2>{{ budgetService.summary().totalSpent | currency:'USD' }}</h2>
+      <span>Recorded spending</span>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon green">💵</div>
+      <p>Remaining Budget</p>
+      <h2 [class.negative]="budgetService.summary().remainingBudget < 0">
+        {{ budgetService.summary().remainingBudget | currency:'USD' }}
+      </h2>
+      <span>Available balance</span>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon purple">✈️</div>
+      <p>Active Trips</p>
+      <h2>{{ budgetService.summary().tripsCount }}</h2>
+      <span>Trips being tracked</span>
+    </article>
+
+  </div>
+
+  <!-- Trip budgets -->
+  <div class="section-header">
+    <div>
+      <h2>Budget by Trip</h2>
+      <p>Monitor the spending of each planned trip.</p>
+    </div>
+  </div>
+
+  <div class="trip-budget-list">
+
+    <article class="trip-budget-card"
+      *ngFor="let trip of budgetService.tripBudgets()">
+
+      <div class="trip-info">
+        <div>
+          <h3>{{ trip.tripTitle }}</h3>
+          <span>Trip budget overview</span>
+        </div>
+
+        <span class="percentage"
+          [class.over-budget]="trip.spent > trip.budget">
+          {{ getPercentage(trip.spent, trip.budget) }}%
+        </span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill"
+          [class.over-budget-fill]="trip.spent > trip.budget"
+          [style.width.%]="
+            trip.budget > 0
+              ? (trip.spent / trip.budget * 100 > 100
+                  ? 100
+                  : trip.spent / trip.budget * 100)
+              : 0
+          ">
+        </div>
+      </div>
+
+      <div class="budget-details">
+        <span>
+          Spent:
+          <strong>{{ trip.spent | currency:'USD' }}</strong>
+        </span>
+
+        <span>
+          Budget:
+          <strong>{{ trip.budget | currency:'USD' }}</strong>
+        </span>
+      </div>
+
+      <div class="warning" *ngIf="trip.spent > trip.budget">
+        ⚠️ You have exceeded this trip's budget!
+      </div>
+
+      <div class="remaining" *ngIf="trip.spent <= trip.budget">
+        {{ (trip.budget - trip.spent) | currency:'USD' }} remaining
+      </div>
+
+      <div class="update-spending">
+        <label [for]="'spent-' + trip.tripId">Update amount spent ($)</label>
+
+        <input
+          type="number"
+          [id]="'spent-' + trip.tripId"
+          min="0"
+          step="1"
+          [ngModel]="trip.spent"
+          (ngModelChange)="updateSpent(trip.tripId, $event)"
+        />
+      </div>
+
+    </article>
+
+    <div class="empty-state"
+      *ngIf="budgetService.tripBudgets().length === 0">
+      <div class="empty-icon">💰</div>
+      <h3>No trips to track yet</h3>
+      <p>Create your first trip to start managing your travel budget.</p>
+    </div>
+
+  </div>
+
+</section>
+

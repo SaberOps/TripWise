@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BudgetComponent } from './budget.component';
+import { provideRouter } from '@angular/router';
 
 describe('BudgetComponent', () => {
   let component: BudgetComponent;

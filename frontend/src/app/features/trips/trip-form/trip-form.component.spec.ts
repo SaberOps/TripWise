@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TripFormComponent } from './trip-form.component';
+import { provideRouter } from '@angular/router';
 
 describe('TripFormComponent', () => {
   let component: TripFormComponent;
@@ -8,7 +9,8 @@ describe('TripFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TripFormComponent]
+      imports: [TripFormComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
