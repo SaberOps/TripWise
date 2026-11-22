@@ -1,4 +1,3 @@
-
 # TRIPWISE – Your Smart Travel Companion
 
 ## Project Description
