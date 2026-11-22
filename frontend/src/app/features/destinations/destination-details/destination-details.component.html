@@ -1,0 +1,67 @@
+<div class="details-page">
+
+  @if (destination) {
+
+    <a routerLink="/destinations" class="back-link">
+      ← Back to destinations
+    </a>
+
+    <section class="hero">
+      <img [src]="destination.imageUrl" [alt]="destination.name">
+
+      <div class="hero-overlay">
+        <span class="category">{{ destination.category }}</span>
+        <h1>{{ destination.name }}</h1>
+        <p>📍 {{ destination.country }}</p>
+      </div>
+    </section>
+
+    <section class="details-content">
+
+      <div class="description-section">
+        <p class="eyebrow">DESTINATION OVERVIEW</p>
+        <h2>Discover {{ destination.name }}</h2>
+        <p class="description">{{ destination.description }}</p>
+
+        <a routerLink="/trips/new" class="plan-button">
+          Plan a trip →
+        </a>
+      </div>
+
+      <aside class="info-card">
+        <h3>Destination information</h3>
+
+        <div class="info-item">
+          <span>Country</span>
+          <strong>{{ destination.country }}</strong>
+        </div>
+
+        <div class="info-item">
+          <span>Category</span>
+          <strong>{{ destination.category }}</strong>
+        </div>
+
+        <div class="info-item">
+          <span>Rating</span>
+          <strong>★ {{ destination.rating }} / 5</strong>
+        </div>
+
+        <div class="info-item">
+          <span>Estimated budget</span>
+          <strong>${{ destination.estimatedBudget }}</strong>
+        </div>
+      </aside>
+
+    </section>
+
+  } @else {
+
+    <div class="not-found">
+      <h2>Destination not found</h2>
+      <p>The destination you're looking for doesn't exist.</p>
+      <a routerLink="/destinations">Return to destinations</a>
+    </div>
+
+  }
+
+</div>

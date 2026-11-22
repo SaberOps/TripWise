@@ -1,6 +1,6 @@
 
 import { Routes } from '@angular/router';
-
+import { DestinationDetailsComponent } from './features/destinations/destination-details/destination-details.component';
 import { HomeComponent } from './features/home/home.component';
 import { DestinationListComponent } from './features/destinations/destination-list/destination-list.component';
 import { TripListComponent } from './features/trips/trip-list/trip-list.component';
@@ -41,5 +41,10 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'home'
-  }
+  },
+  {
+  path: 'destinations/:id',
+  component: DestinationDetailsComponent,
+  title: 'TripWise | Destination Details'
+},
 ];
