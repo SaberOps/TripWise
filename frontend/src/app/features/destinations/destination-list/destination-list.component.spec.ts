@@ -2,13 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DestinationListComponent } from './destination-list.component';
 
+import { provideRouter } from '@angular/router';
 describe('DestinationListComponent', () => {
   let component: DestinationListComponent;
   let fixture: ComponentFixture<DestinationListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DestinationListComponent]
+      imports: [DestinationListComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
