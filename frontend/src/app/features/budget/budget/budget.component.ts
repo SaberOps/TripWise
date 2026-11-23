@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -18,79 +18,76 @@ export class BudgetComponent implements OnInit {
   readonly budgetService = inject(BudgetService);
   private readonly tripService = inject(TripService);
 
-  isLoading = true;
-  errorMessage = '';
-  successMessage = '';
-  overallBudgetDraft = '';
+  readonly isLoading = signal(true);
+  readonly errorMessage = signal('');
+  readonly successMessage = signal('');
+  readonly overallBudgetDraft = signal<number | null>(null);
 
-  // Temporary values while the user is typing
-  draftAmounts: Record<string, string> = {};
+  readonly draftAmounts = signal<Record<string, number | null>>({});
 
   ngOnInit(): void {
     this.tripService.getAll().subscribe({
       next: () => {
-        this.budgetService.tripBudgets().forEach(trip => {
-          this.draftAmounts[trip.tripId] = String(trip.spent);
-        });
+        this.draftAmounts.set(Object.fromEntries(
+          this.budgetService.tripBudgets().map(trip => [trip.tripId, trip.spent])
+        ));
 
         const summary = this.budgetService.summary();
-        this.overallBudgetDraft = summary.overallBudgetIsSet
-          ? String(summary.totalBudget)
-          : '';
+        this.overallBudgetDraft.set(summary.overallBudgetIsSet ? summary.totalBudget : null);
 
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
       error: error => {
         console.error('Unable to load trips for budget:', error);
-        this.errorMessage = 'Unable to load trip budgets.';
-        this.isLoading = false;
+        this.errorMessage.set('Unable to load trip budgets.');
+        this.isLoading.set(false);
       }
     });
   }
 
   saveOverallBudget(): void {
-    const value = this.overallBudgetDraft.trim();
-    const amount = Number(value);
-    if (!value || !Number.isFinite(amount) || amount < 0) {
-      this.errorMessage = 'Enter a valid total budget of zero or more.';
-      this.successMessage = '';
+    const amount = this.overallBudgetDraft();
+    if (amount === null || !Number.isFinite(amount) || amount < 0) {
+      this.errorMessage.set('Enter a valid total budget of zero or more.');
+      this.successMessage.set('');
       return;
     }
 
     this.budgetService.setOverallBudget(amount);
-    this.errorMessage = '';
-    this.successMessage = 'Overall travel budget saved.';
+    this.errorMessage.set('');
+    this.successMessage.set('Overall travel budget saved.');
   }
 
   useTripBudgetsTotal(): void {
     this.budgetService.clearOverallBudget();
-    this.overallBudgetDraft = '';
-    this.errorMessage = '';
-    this.successMessage = 'Total budget now follows the sum of your trip budgets.';
+    this.overallBudgetDraft.set(null);
+    this.errorMessage.set('');
+    this.successMessage.set('Total budget now follows the sum of your trip budgets.');
   }
 
-  setDraftAmount(tripId: string, value: string): void {
-    this.draftAmounts[tripId] = value;
-    this.successMessage = '';
+  setDraftAmount(tripId: string, value: number | null): void {
+    this.draftAmounts.update(amounts => ({ ...amounts, [tripId]: value }));
+    this.successMessage.set('');
   }
 
   saveSpent(tripId: string): void {
-    const amount = Number(this.draftAmounts[tripId]);
+    const amount = this.draftAmounts()[tripId];
 
     if (
-      this.draftAmounts[tripId].trim() === '' ||
+      amount === null ||
+      amount === undefined ||
       !Number.isFinite(amount) ||
       amount < 0
     ) {
-      this.errorMessage = 'Please enter a valid amount greater than or equal to 0.';
-      this.successMessage = '';
+      this.errorMessage.set('Please enter a valid amount greater than or equal to 0.');
+      this.successMessage.set('');
       return;
     }
 
     this.budgetService.updateSpent(tripId, amount);
 
-    this.errorMessage = '';
-    this.successMessage = 'Spending amount saved successfully!';
+    this.errorMessage.set('');
+    this.successMessage.set('Spending amount saved successfully!');
   }
 
   getPercentage(spent: number, budget: number): number {
