@@ -1,79 +1,90 @@
-import { Injectable, signal } from '@angular/core';
-import { Destination } from '../models/destination.model';
+
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+
+import {
+  Destination,
+  CreateDestination,
+  UpdateDestination
+} from '../models/destination.model';
+
+interface ApiResponse<T> {
+  success: boolean;
+  count?: number;
+  message?: string;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class DestinationService {
 
-  private readonly destinations = signal<Destination[]>([
-    {
-      id: 1,
-      name: 'Santorini',
-      country: 'Greece',
-      description: 'Discover white houses, blue domes and beautiful sunsets.',
-      imageUrl: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=900',
-      category: 'Beach',
-      estimatedBudget: 850,
-      rating: 4.9
-    },
-    {
-      id: 2,
-      name: 'Bali',
-      country: 'Indonesia',
-      description: 'Explore tropical beaches, temples and green rice terraces.',
-      imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=900',
-      category: 'Adventure',
-      estimatedBudget: 720,
-      rating: 4.8
-    },
-    {
-      id: 3,
-      name: 'Swiss Alps',
-      country: 'Switzerland',
-      description: 'Enjoy spectacular mountains and unforgettable landscapes.',
-      imageUrl: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900',
-      category: 'Mountain',
-      estimatedBudget: 1200,
-      rating: 4.9
-    },
-    {
-      id: 4,
-      name: 'Paris',
-      country: 'France',
-      description: 'Experience iconic monuments, museums and French culture.',
-      imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900',
-      category: 'City',
-      estimatedBudget: 950,
-      rating: 4.7
-    },
-    {
-      id: 5,
-      name: 'Marrakech',
-      country: 'Morocco',
-      description: 'Explore colorful markets, historic palaces and gardens.',
-      imageUrl: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=900',
-      category: 'Cultural',
-      estimatedBudget: 600,
-      rating: 4.8
-    },
-    {
-      id: 6,
-      name: 'Maldives',
-      country: 'Maldives',
-      description: 'Relax in turquoise waters and beautiful island resorts.',
-      imageUrl: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=900',
-      category: 'Beach',
-      estimatedBudget: 1500,
-      rating: 5.0
-    }
-  ]);
+  private readonly http = inject(HttpClient);
 
-  getAll(): Destination[] {
-    return this.destinations();
+  private readonly apiUrl = '/api/destinations';
+
+  private readonly destinations = signal<Destination[]>([]);
+
+  readonly destinations$ = this.destinations.asReadonly();
+
+  // GET: Retrieve all destinations
+  getAll(): Observable<ApiResponse<Destination[]>> {
+    return this.http.get<ApiResponse<Destination[]>>(this.apiUrl).pipe(
+      tap(response => this.destinations.set(response.data))
+    );
   }
 
-  getById(id: number): Destination | undefined {
-    return this.destinations().find(destination => destination.id === id);
+  // GET: Retrieve one destination
+  getById(id: string): Observable<ApiResponse<Destination>> {
+    return this.http.get<ApiResponse<Destination>>(`${this.apiUrl}/${id}`);
+  }
+
+  // POST: Create a destination
+  create(destination: CreateDestination): Observable<ApiResponse<Destination>> {
+    return this.http.post<ApiResponse<Destination>>(
+      this.apiUrl,
+      destination
+    ).pipe(
+      tap(response => {
+        this.destinations.update(current => [
+          response.data,
+          ...current
+        ]);
+      })
+    );
+  }
+
+  // PUT: Update a destination
+  update(
+    id: string,
+    destination: UpdateDestination
+  ): Observable<ApiResponse<Destination>> {
+    return this.http.put<ApiResponse<Destination>>(
+      `${this.apiUrl}/${id}`,
+      destination
+    ).pipe(
+      tap(response => {
+        this.destinations.update(current =>
+          current.map(item =>
+            item._id === id ? response.data : item
+          )
+        );
+      })
+    );
+  }
+
+  // DELETE: Remove a destination
+  delete(id: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(
+      `${this.apiUrl}/${id}`
+    ).pipe(
+      tap(() => {
+        this.destinations.update(current =>
+          current.filter(item => item._id !== id)
+        );
+      })
+    );
   }
 }

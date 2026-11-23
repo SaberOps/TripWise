@@ -51,12 +51,12 @@ export const routes: Routes = [
     title: 'TripWise | Budget'
   },
   {
-    path: '**',
-    redirectTo: 'home'
+    path: 'destinations/:id',
+    component: DestinationDetailsComponent,
+    title: 'TripWise | Destination Details'
   },
   {
-  path: 'destinations/:id',
-  component: DestinationDetailsComponent,
-  title: 'TripWise | Destination Details'
-},
+    path: '**',
+    redirectTo: 'home'
+  }
 ];

@@ -20,7 +20,7 @@
 
     <section class="favorites-grid">
 
-      @for (destination of favorites; track destination.id) {
+      @for (destination of favorites; track destination._id) {
 
         <article class="favorite-card">
 
@@ -32,7 +32,7 @@
 
             <button
               class="remove-button"
-              (click)="removeFavorite(destination.id)"
+              (click)="removeFavorite(destination._id)"
               [attr.aria-label]="'Remove ' + destination.name + ' from favorites'"
               title="Remove from favorites"
             >
@@ -59,7 +59,7 @@
               </div>
 
               <a
-                [routerLink]="['/destinations', destination.id]"
+                [routerLink]="['/destinations', destination._id]"
                 class="details-button"
               >
                 View details →

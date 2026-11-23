@@ -1,5 +1,7 @@
-import { Component, inject } from '@angular/core';
+
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
 import { Destination } from '../../../core/models/destination.model';
 import { DestinationService } from '../../../core/services/destination.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
@@ -11,18 +13,15 @@ import { FavoritesService } from '../../../core/services/favorites.service';
   templateUrl: './destination-list.component.html',
   styleUrl: './destination-list.component.css'
 })
-export class DestinationListComponent {
+export class DestinationListComponent implements OnInit {
 
   private readonly destinationService = inject(DestinationService);
   private readonly favoritesService = inject(FavoritesService);
 
-isFavorite(id: number): boolean {
-  return this.favoritesService.isFavorite(id);
-}
+  destinations: Destination[] = [];
 
-toggleFavorite(id: number): void {
-  this.favoritesService.toggleFavorite(id);
-}
+  isLoading = true;
+  errorMessage = '';
 
   searchTerm = '';
   selectedCategory = 'All';
@@ -36,7 +35,34 @@ toggleFavorite(id: number): void {
     'Cultural'
   ];
 
-  destinations: Destination[] = this.destinationService.getAll();
+  ngOnInit(): void {
+    this.loadDestinations();
+  }
+
+  loadDestinations(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.destinationService.getAll().subscribe({
+      next: (response) => {
+        this.destinations = response.data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading destinations:', error);
+        this.errorMessage = 'Unable to load destinations. Please try again.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  isFavorite(id: string): boolean {
+    return this.favoritesService.isFavorite(id);
+  }
+
+  toggleFavorite(id: string): void {
+    this.favoritesService.toggleFavorite(id);
+  }
 
   get filteredDestinations(): Destination[] {
     return this.destinations.filter(destination => {
@@ -69,4 +95,5 @@ toggleFavorite(id: number): void {
     this.selectedCategory = 'All';
   }
 }
+
 

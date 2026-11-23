@@ -9,7 +9,8 @@ describe('BudgetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BudgetComponent]
+      imports: [BudgetComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

@@ -1,4 +1,3 @@
-
 import { Component, inject, OnInit } from '@angular/core';
 import {
   AbstractControl,
@@ -8,18 +7,18 @@ import {
   Validators
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { Destination } from '../../../core/models/destination.model';
+import { TripStatus } from '../../../core/models/trip.model';
 import { DestinationService } from '../../../core/services/destination.service';
 import { TripService } from '../../../core/services/trip.service';
 
 function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
   const startDate = control.get('startDate')?.value;
   const endDate = control.get('endDate')?.value;
-
-  if (startDate && endDate && endDate < startDate) {
-    return { invalidDateRange: true };
-  }
-
-  return null;
+  return startDate && endDate && endDate < startDate
+    ? { invalidDateRange: true }
+    : null;
 }
 
 @Component({
@@ -30,17 +29,18 @@ function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
   styleUrl: './trip-form.component.css'
 })
 export class TripFormComponent implements OnInit {
-
   private readonly fb = inject(FormBuilder);
   private readonly tripService = inject(TripService);
   private readonly destinationService = inject(DestinationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  readonly destinations = this.destinationService.getAll();
-
-  tripId: number | null = null;
+  destinations: Destination[] = [];
+  tripId: string | null = null;
   isEditMode = false;
+  isLoading = true;
+  isSaving = false;
+  errorMessage = '';
 
   tripForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -49,31 +49,53 @@ export class TripFormComponent implements OnInit {
     endDate: ['', Validators.required],
     budget: [1000, [Validators.required, Validators.min(1)]],
     travelers: [1, [Validators.required, Validators.min(1)]],
-    status: ['Planned', Validators.required],
+    status: ['Planned' as TripStatus, Validators.required],
     notes: ['']
-  }, {
-    validators: dateRangeValidator
-  });
+  }, { validators: dateRangeValidator });
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    this.tripId = this.route.snapshot.paramMap.get('id');
+    this.isEditMode = !!this.tripId;
 
-    if (id) {
-      this.tripId = Number(id);
-      this.isEditMode = true;
-
-      const trip = this.tripService.getById(this.tripId);
-
-      if (!trip) {
-        this.router.navigate(['/trips']);
-        return;
+    this.destinationService.getAll().subscribe({
+      next: response => {
+        this.destinations = response.data;
+        if (this.isEditMode && this.tripId) {
+          this.loadTrip(this.tripId);
+        } else {
+          this.isLoading = false;
+        }
+      },
+      error: error => {
+        console.error('Unable to load destinations:', error);
+        this.errorMessage = 'Unable to load destinations. Please try again.';
+        this.isLoading = false;
       }
+    });
+  }
 
-      this.tripForm.patchValue({
-        ...trip,
-        destinationId: String(trip.destinationId)
-      });
-    }
+  private loadTrip(id: string): void {
+    this.tripService.getById(id).subscribe({
+      next: response => {
+        const trip = response.data;
+        this.tripForm.patchValue({
+          title: trip.title,
+          destinationId: trip.destinationId._id,
+          startDate: trip.startDate.slice(0, 10),
+          endDate: trip.endDate.slice(0, 10),
+          budget: trip.budget,
+          travelers: trip.travelers,
+          status: trip.status,
+          notes: trip.notes ?? ''
+        });
+        this.isLoading = false;
+      },
+      error: error => {
+        console.error('Unable to load trip:', error);
+        this.errorMessage = 'Trip not found or could not be loaded.';
+        this.isLoading = false;
+      }
+    });
   }
 
   get title() {
@@ -81,8 +103,8 @@ export class TripFormComponent implements OnInit {
   }
 
   get dateRangeInvalid(): boolean {
-    return this.tripForm.hasError('invalidDateRange') &&
-      !!this.tripForm.get('endDate')?.touched;
+    return this.tripForm.hasError('invalidDateRange')
+      && !!this.tripForm.get('endDate')?.touched;
   }
 
   onSubmit(): void {
@@ -91,26 +113,33 @@ export class TripFormComponent implements OnInit {
       return;
     }
 
-    const formValue = this.tripForm.getRawValue();
-
+    const value = this.tripForm.getRawValue();
     const tripData = {
-      title: formValue.title!,
-      destinationId: Number(formValue.destinationId),
-      startDate: formValue.startDate!,
-      endDate: formValue.endDate!,
-      budget: Number(formValue.budget),
-      travelers: Number(formValue.travelers),
-      status: formValue.status as 'Planned' | 'Ongoing' | 'Completed',
-      notes: formValue.notes ?? ''
+      title: value.title!.trim(),
+      destinationId: value.destinationId!,
+      startDate: value.startDate!,
+      endDate: value.endDate!,
+      budget: Number(value.budget),
+      travelers: Number(value.travelers),
+      status: value.status!,
+      notes: value.notes ?? ''
     };
 
-    if (this.isEditMode && this.tripId !== null) {
-      this.tripService.update(this.tripId, tripData);
-    } else {
-      this.tripService.add(tripData);
-    }
+    this.isSaving = true;
+    this.errorMessage = '';
 
-    this.router.navigate(['/trips']);
+    const request = this.isEditMode && this.tripId
+      ? this.tripService.update(this.tripId, tripData)
+      : this.tripService.add(tripData);
+
+    request.subscribe({
+      next: () => this.router.navigate(['/trips']),
+      error: error => {
+        console.error('Unable to save trip:', error);
+        this.errorMessage = error?.error?.message || 'Unable to save trip. Please try again.';
+        this.isSaving = false;
+      }
+    });
   }
 
   cancel(): void {

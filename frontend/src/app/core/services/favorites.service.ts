@@ -1,5 +1,5 @@
 
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Destination } from '../models/destination.model';
 import { DestinationService } from './destination.service';
 
@@ -8,20 +8,18 @@ import { DestinationService } from './destination.service';
 })
 export class FavoritesService {
 
-  private readonly favoriteIds = signal<number[]>(
+  private readonly destinationService = inject(DestinationService);
+
+  private readonly favoriteIds = signal<string[]>(
     this.loadFavorites()
   );
 
   readonly favoriteCount = this.favoriteIds.asReadonly();
 
-  constructor(
-    private readonly destinationService: DestinationService
-  ) {}
-
-  private loadFavorites(): number[] {
+  private loadFavorites(): string[] {
     try {
       const saved = localStorage.getItem('tripwise-favorites');
-      return saved ? JSON.parse(saved) as number[] : [];
+      return saved ? JSON.parse(saved) as string[] : [];
     } catch {
       return [];
     }
@@ -34,11 +32,11 @@ export class FavoritesService {
     );
   }
 
-  isFavorite(destinationId: number): boolean {
+  isFavorite(destinationId: string): boolean {
     return this.favoriteIds().includes(destinationId);
   }
 
-  toggleFavorite(destinationId: number): void {
+  toggleFavorite(destinationId: string): void {
     this.favoriteIds.update(ids =>
       ids.includes(destinationId)
         ? ids.filter(id => id !== destinationId)
@@ -49,14 +47,13 @@ export class FavoritesService {
   }
 
   getFavorites(): Destination[] {
-    return this.favoriteIds()
-      .map(id => this.destinationService.getById(id))
-      .filter((destination): destination is Destination =>
-        destination !== undefined
-      );
+    const ids = this.favoriteIds();
+
+    return this.destinationService.destinations$()
+      .filter(destination => ids.includes(destination._id));
   }
 
-  removeFavorite(destinationId: number): void {
+  removeFavorite(destinationId: string): void {
     this.favoriteIds.update(ids =>
       ids.filter(id => id !== destinationId)
     );
@@ -64,3 +61,4 @@ export class FavoritesService {
     this.saveFavorites();
   }
 }
+

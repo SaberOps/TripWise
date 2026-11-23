@@ -6,7 +6,7 @@ export interface BudgetSummary {
 }
 
 export interface TripBudget {
-  tripId: number;
+  tripId: string;
   tripTitle: string;
   budget: number;
   spent: number;

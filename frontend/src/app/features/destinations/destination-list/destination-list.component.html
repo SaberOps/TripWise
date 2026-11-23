@@ -46,7 +46,7 @@
 
   <section class="destination-grid">
 
-    @for (destination of filteredDestinations; track destination.id) {
+    @for (destination of filteredDestinations; track destination._id) {
 
       <article class="destination-card">
 
@@ -57,14 +57,14 @@
           />
           <button
   class="favorite-button"
-  [class.active]="isFavorite(destination.id)"
-  (click)="toggleFavorite(destination.id)"
-  [attr.aria-label]="isFavorite(destination.id)
+  [class.active]="isFavorite(destination._id)"
+  (click)="toggleFavorite(destination._id)"
+  [attr.aria-label]="isFavorite(destination._id)
     ? 'Remove from favorites'
     : 'Add to favorites'"
   title="Toggle favorite"
 >
-  {{ isFavorite(destination.id) ? '♥' : '♡' }}
+  {{ isFavorite(destination._id) ? '♥' : '♡' }}
 </button>
 
           <span class="category-badge">
@@ -94,7 +94,7 @@
             </div>
 
             <a
-              [routerLink]="['/destinations', destination.id]"
+              [routerLink]="['/destinations', destination._id]"
               class="details-button"
             >
               View details →

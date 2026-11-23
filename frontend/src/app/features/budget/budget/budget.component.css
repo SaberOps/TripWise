@@ -265,3 +265,99 @@
     flex-direction: column;
   }
 }
+/* Spending input and Save button */
+.spending-input-group {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+}
+
+.spending-input-group input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0f2942;
+  transition: all 0.2s ease;
+}
+
+.spending-input-group input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+  outline: none;
+}
+
+.save-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 22px;
+  min-width: 145px;
+  border: none;
+  border-radius: 10px;
+  background: #0d9488;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 8px rgba(13, 148, 136, 0.2);
+}
+
+.save-button:hover {
+  background: #0f766e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(13, 148, 136, 0.25);
+}
+
+.save-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.save-button:focus-visible {
+  outline: 3px solid rgba(13, 148, 136, 0.3);
+  outline-offset: 3px;
+}
+
+.save-icon {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* Feedback messages */
+.success {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: #ccfbf1;
+  color: #0f766e;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .spending-input-group {
+    flex-direction: column;
+  }
+
+  .save-button {
+    min-height: 44px;
+    width: 100%;
+  }
+}

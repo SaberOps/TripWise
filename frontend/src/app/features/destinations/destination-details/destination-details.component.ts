@@ -1,5 +1,7 @@
+
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+
 import { Destination } from '../../../core/models/destination.model';
 import { DestinationService } from '../../../core/services/destination.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
@@ -17,23 +19,43 @@ export class DestinationDetailsComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly favoritesService = inject(FavoritesService);
 
-get isFavorite(): boolean {
-  return this.destination
-    ? this.favoritesService.isFavorite(this.destination.id)
-    : false;
-}
-
-toggleFavorite(): void {
-  if (this.destination) {
-    this.favoritesService.toggleFavorite(this.destination.id);
-  }
-}
-
   destination: Destination | undefined;
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+  isLoading = true;
+  errorMessage = '';
 
-    this.destination = this.destinationService.getById(id);
+  get isFavorite(): boolean {
+    return this.destination
+      ? this.favoritesService.isFavorite(this.destination._id)
+      : false;
+  }
+
+  toggleFavorite(): void {
+    if (this.destination) {
+      this.favoritesService.toggleFavorite(this.destination._id);
+    }
+  }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (!id) {
+      this.errorMessage = 'Destination not found.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.destinationService.getById(id).subscribe({
+      next: (response) => {
+        this.destination = response.data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading destination:', error);
+        this.errorMessage = 'Unable to load destination details.';
+        this.isLoading = false;
+      }
+    });
   }
 }
+

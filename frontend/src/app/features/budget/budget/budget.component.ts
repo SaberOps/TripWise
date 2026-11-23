@@ -1,8 +1,10 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { BudgetService } from '../../../core/services/budget.service';
+import { TripService } from '../../../core/services/trip.service';
 
 @Component({
   selector: 'app-budget',
@@ -11,15 +13,61 @@ import { BudgetService } from '../../../core/services/budget.service';
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.css'
 })
-export class BudgetComponent {
+export class BudgetComponent implements OnInit {
+
   readonly budgetService = inject(BudgetService);
+  private readonly tripService = inject(TripService);
+
+  isLoading = true;
+  errorMessage = '';
+  successMessage = '';
+
+  // Temporary values while the user is typing
+  draftAmounts: Record<string, string> = {};
+
+  ngOnInit(): void {
+    this.tripService.getAll().subscribe({
+      next: () => {
+        this.budgetService.tripBudgets().forEach(trip => {
+          this.draftAmounts[trip.tripId] = String(trip.spent);
+        });
+
+        this.isLoading = false;
+      },
+      error: error => {
+        console.error('Unable to load trips for budget:', error);
+        this.errorMessage = 'Unable to load trip budgets.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  setDraftAmount(tripId: string, value: string): void {
+    this.draftAmounts[tripId] = value;
+    this.successMessage = '';
+  }
+
+  saveSpent(tripId: string): void {
+    const amount = Number(this.draftAmounts[tripId]);
+
+    if (
+      this.draftAmounts[tripId].trim() === '' ||
+      !Number.isFinite(amount) ||
+      amount < 0
+    ) {
+      this.errorMessage = 'Please enter a valid amount greater than or equal to 0.';
+      this.successMessage = '';
+      return;
+    }
+
+    this.budgetService.updateSpent(tripId, amount);
+
+    this.errorMessage = '';
+    this.successMessage = 'Spending amount saved successfully!';
+  }
 
   getPercentage(spent: number, budget: number): number {
     return this.budgetService.getPercentage(spent, budget);
-  }
-
-  updateSpent(tripId: number, amount: number): void {
-    this.budgetService.updateSpent(tripId, amount);
   }
 }
 
