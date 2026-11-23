@@ -1,80 +1,73 @@
-import { Component } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { DestinationService } from '../../core/services/destination.service';
+import { FavoritesService } from '../../core/services/favorites.service';
+import { TripService } from '../../core/services/trip.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
-  stats = [
-    {
-      title: 'Total Trips',
-      value: '12',
-      description: 'Trips planned',
-      color: 'teal'
-    },
-    {
-      title: 'Countries Visited',
-      value: '08',
-      description: 'Amazing countries',
-      color: 'blue'
-    },
-    {
-      title: 'Favorite Places',
-      value: '15',
-      description: 'Saved destinations',
-      color: 'orange'
-    },
-    {
-      title: 'Total Budget',
-      value: '$4,250',
-      description: 'Travel budget',
-      color: 'purple'
-    }
-  ];
+export class HomeComponent implements OnInit {
+  private readonly destinationService = inject(DestinationService);
+  private readonly favoritesService = inject(FavoritesService);
+  private readonly tripService = inject(TripService);
 
-  destinations = [
-    {
-      name: 'Santorini',
-      country: 'Greece',
-      category: 'Island',
-      price: '$850',
-      rating: '4.9',
-      image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800'
-    },
-    {
-      name: 'Bali',
-      country: 'Indonesia',
-      category: 'Beach',
-      price: '$720',
-      rating: '4.8',
-      image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800'
-    },
-    {
-      name: 'Swiss Alps',
-      country: 'Switzerland',
-      category: 'Mountain',
-      price: '$1,200',
-      rating: '4.9',
-      image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800'
-    }
-  ];
+  readonly destinations = this.destinationService.destinations$;
+  readonly popularDestinations = computed(() => this.destinations().slice(0, 3));
+  readonly trips = this.tripService.tripsList;
+  readonly upcomingTrips = computed(() =>
+    this.trips()
+      .filter(trip => trip.status !== 'Completed')
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .slice(0, 3)
+  );
+  readonly stats = computed(() => {
+    const trips = this.trips();
+    const visitedCountries = new Set(
+      trips
+        .filter(trip => trip.status === 'Completed')
+        .map(trip => trip.destinationId.country)
+    );
 
-  upcomingTrips = [
-    {
-      destination: 'Paris, France',
-      date: '15 December 2026',
-      duration: '5 days',
-      status: 'Planned'
-    },
-    {
-      destination: 'Rome, Italy',
-      date: '10 January 2027',
-      duration: '7 days',
-      status: 'Planned'
-    }
-  ];
+    return [
+      { title: 'My Trips', value: String(trips.length), description: 'Trips planned', color: 'teal' },
+      { title: 'Countries Visited', value: String(visitedCountries.size), description: 'From completed trips', color: 'blue' },
+      { title: 'Favorite Places', value: String(this.favoritesService.favoriteCount().length), description: 'Saved destinations', color: 'orange' },
+      { title: 'Trip Budgets', value: trips.reduce((sum, trip) => sum + trip.budget, 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }), description: 'Across planned trips', color: 'purple' }
+    ];
+  });
+
+  isLoading = true;
+  errorMessage = '';
+
+  ngOnInit(): void {
+    let pendingRequests = 2;
+    const finishRequest = (): void => {
+      pendingRequests -= 1;
+      this.isLoading = pendingRequests > 0;
+    };
+
+    this.destinationService.getAll().subscribe({
+      error: error => {
+        console.error('Unable to load destinations:', error);
+        this.errorMessage = 'Unable to load destinations. Please try again from Explore Destinations.';
+        finishRequest();
+      },
+      complete: finishRequest
+    });
+
+    this.tripService.getAll().subscribe({
+      error: error => {
+        console.error('Unable to load trips:', error);
+        finishRequest();
+      },
+      complete: finishRequest
+    });
+  }
 }

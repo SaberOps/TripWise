@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed:destinations": "node src/seed/destinations.js"
   },
   "dependencies": {
     "cors": "^2.8.6",

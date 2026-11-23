@@ -2,7 +2,7 @@
   <section class="welcome-section" aria-labelledby="welcome-title">
     <div class="welcome-copy">
       <p class="welcome-label">YOUR TRAVEL DASHBOARD</p>
-      <h1 id="welcome-title">Welcome back, Saber!</h1>
+      <h1 id="welcome-title">Your next trip starts here.</h1>
       <p class="welcome-description">
         Ready for your next adventure? Let's explore the world.
       </p>
@@ -13,12 +13,14 @@
     </a>
   </section>
 
+  @if (errorMessage) { <p class="home-error" role="alert">{{ errorMessage }}</p> }
+
   <section class="stats-grid" aria-label="Travel overview">
-    @for (stat of stats; track stat.title) {
+    @for (stat of stats(); track stat.title) {
       <article class="stat-card">
         <div class="stat-icon" [class]="stat.color" aria-hidden="true">
           @switch (stat.title) {
-            @case ('Total Trips') {
+            @case ('My Trips') {
               <svg viewBox="0 0 24 24" fill="none"><path d="m3 13 7.2-1.7L17 4.5a2 2 0 0 1 2.8 2.8l-6.8 6.8L11.3 21l-2.1-5.1L3 13Z"/><path d="m7 17-3 3"/></svg>
             }
             @case ('Countries Visited') {
@@ -51,11 +53,14 @@
       <a routerLink="/destinations" class="view-link">View all <span aria-hidden="true">→</span></a>
     </div>
 
+    @if (isLoading && destinations().length === 0) {
+      <p class="home-message" role="status">Loading destinations…</p>
+    } @else if (destinations().length > 0) {
     <div class="destination-grid">
-      @for (destination of destinations; track destination.name) {
+      @for (destination of popularDestinations(); track destination._id) {
         <article class="destination-card">
           <div class="destination-image">
-            <img [src]="destination.image" [alt]="destination.name" width="800" height="500" loading="lazy" decoding="async">
+            <img [src]="destination.imageUrl" [alt]="destination.name" width="800" height="500" loading="lazy" decoding="async">
             <span class="rating"><span aria-hidden="true">★</span> {{ destination.rating }}</span>
           </div>
 
@@ -68,13 +73,16 @@
             </p>
 
             <div class="destination-footer">
-              <span>From <strong>{{ destination.price }}</strong></span>
-              <a routerLink="/destinations">Explore <span aria-hidden="true">→</span></a>
+              <span>Est. <strong>{{ destination.estimatedBudget | currency:'USD':'symbol':'1.0-0' }}</strong></span>
+              <a [routerLink]="['/destinations', destination._id]">Explore <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </article>
       }
     </div>
+    } @else {
+      <p class="home-message">No destinations yet. Add destinations to MongoDB with the seed command, then refresh.</p>
+    }
   </section>
 
   <section class="content-section upcoming-section" aria-labelledby="upcoming-title">
@@ -87,17 +95,20 @@
     </div>
 
     <div class="trips-list">
-      @for (trip of upcomingTrips; track trip.destination) {
+      @for (trip of upcomingTrips(); track trip._id) {
         <article class="trip-card">
           <div class="trip-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none"><path d="m3 13 7.2-1.7L17 4.5a2 2 0 0 1 2.8 2.8l-6.8 6.8L11.3 21l-2.1-5.1L3 13Z"/><path d="m7 17-3 3"/></svg>
           </div>
           <div class="trip-details">
-            <h3>{{ trip.destination }}</h3>
-            <p>{{ trip.date }} <span aria-hidden="true">·</span> {{ trip.duration }}</p>
+            <h3>{{ trip.destinationId.name }}, {{ trip.destinationId.country }}</h3>
+            <p>{{ trip.startDate | date:'mediumDate' }} <span aria-hidden="true">·</span> {{ trip.endDate | date:'mediumDate' }}</p>
           </div>
           <span class="trip-status">{{ trip.status }}</span>
         </article>
+      }
+      @empty {
+        <p class="home-message">No trips planned yet. Create your first trip to see it here.</p>
       }
     </div>
 
