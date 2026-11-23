@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -10,33 +9,28 @@ import { RouterLink } from '@angular/router';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-
   stats = [
     {
       title: 'Total Trips',
       value: '12',
-      icon: '✈',
       description: 'Trips planned',
       color: 'teal'
     },
     {
       title: 'Countries Visited',
       value: '08',
-      icon: '🌍',
       description: 'Amazing countries',
       color: 'blue'
     },
     {
       title: 'Favorite Places',
       value: '15',
-      icon: '♡',
       description: 'Saved destinations',
       color: 'orange'
     },
     {
       title: 'Total Budget',
       value: '$4,250',
-      icon: '◈',
       description: 'Travel budget',
       color: 'purple'
     }
@@ -84,4 +78,3 @@ export class HomeComponent {
     }
   ];
 }
-

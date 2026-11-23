@@ -8,25 +8,44 @@
       <p>Track your travel expenses and keep your trips within budget.</p>
     </div>
   </div>
-  @if (errorMessage) {
-  <p class="error" role="alert">{{ errorMessage }}</p>
-}
 
-@if (successMessage) {
-  <p class="success" role="status">{{ successMessage }}</p>
-}
+  @if (errorMessage) { <p class="feedback error" role="alert">{{ errorMessage }}</p> }
+  @if (successMessage) { <p class="feedback success" role="status">{{ successMessage }}</p> }
+  @if (isLoading) { <p class="loading-message" role="status">Loading budget information...</p> }
 
-  @if (errorMessage) { <p class="error" role="alert">{{ errorMessage }}</p> }
-  @if (isLoading) { <p>Loading budget information...</p> }
+  <section class="overall-budget" aria-labelledby="overall-budget-title">
+    <div class="overall-copy">
+      <span class="eyebrow">YOUR TRAVEL PLAN</span>
+      <h2 id="overall-budget-title">Set your overall budget</h2>
+      <p>Choose your total travel spending limit. Trip budgets count toward this amount.</p>
+    </div>
+    <form class="overall-budget-form" (ngSubmit)="saveOverallBudget()">
+      <label for="overall-budget">Total travel budget <span>(USD)</span></label>
+      <div class="overall-input-row">
+        <div class="currency-input">
+          <span aria-hidden="true">$</span>
+          <input id="overall-budget" name="overallBudget" type="number" min="0" step="0.01"
+            inputmode="decimal" required [(ngModel)]="overallBudgetDraft" placeholder="e.g. 5000">
+        </div>
+        <button class="save-button" type="submit">Save budget</button>
+      </div>
+      @if (budgetService.summary().overallBudgetIsSet) {
+        <button class="use-trip-total" type="button" (click)="useTripBudgetsTotal()">
+          Use sum of trip budgets instead
+        </button>
+      }
+    </form>
+  </section>
 
   <!-- Summary cards -->
+  <section class="summary-section" aria-label="Budget overview">
   <div class="summary-grid">
 
     <article class="summary-card">
       <div class="card-icon blue">💰</div>
       <p>Total Budget</p>
       <h2>{{ budgetService.summary().totalBudget | currency:'USD' }}</h2>
-      <span>Across all your trips</span>
+      <span>{{ budgetService.summary().overallBudgetIsSet ? 'Your overall spending limit' : 'Sum of trip budgets' }}</span>
     </article>
 
     <article class="summary-card">
@@ -42,7 +61,7 @@
       <h2 [class.negative]="budgetService.summary().remainingBudget < 0">
         {{ budgetService.summary().remainingBudget | currency:'USD' }}
       </h2>
-      <span>Available balance</span>
+      <span>{{ budgetService.summary().remainingBudget < 0 ? 'Over your total limit' : 'Available to spend' }}</span>
     </article>
 
     <article class="summary-card">
@@ -53,6 +72,33 @@
     </article>
 
   </div>
+  @if (budgetService.summary().totalBudget > 0) {
+    <div class="overall-progress" [class.over-budget]="budgetService.summary().totalSpent > budgetService.summary().totalBudget">
+      <div class="progress-heading">
+        <span>Overall spending</span>
+        <strong>{{ getPercentage(budgetService.summary().totalSpent, budgetService.summary().totalBudget) }}%</strong>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="Overall budget spent"
+        [attr.aria-valuenow]="getPercentage(budgetService.summary().totalSpent, budgetService.summary().totalBudget)"
+        aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" [style.width.%]="getPercentage(budgetService.summary().totalSpent, budgetService.summary().totalBudget) > 100 ? 100 : getPercentage(budgetService.summary().totalSpent, budgetService.summary().totalBudget)"></div>
+      </div>
+      <p>{{ budgetService.summary().totalSpent | currency:'USD' }} spent of {{ budgetService.summary().totalBudget | currency:'USD' }}</p>
+    </div>
+  }
+  </section>
+
+  <section class="allocation-card" aria-label="Budget allocation">
+    <div><span>Allocated to trips</span><strong>{{ budgetService.summary().allocatedBudget | currency:'USD' }}</strong></div>
+    <div><span>Unallocated</span><strong [class.negative]="budgetService.summary().unallocatedBudget < 0">
+      {{ budgetService.summary().unallocatedBudget | currency:'USD' }}
+    </strong></div>
+    @if (budgetService.summary().unallocatedBudget < 0) {
+      <p class="allocation-warning">Your trip budgets exceed your overall budget. Adjust your trip plans or increase your limit.</p>
+    } @else if (budgetService.summary().overallBudgetIsSet) {
+      <p class="allocation-hint">This amount is available for new trips or unexpected costs.</p>
+    }
+  </section>
 
   <!-- Trip budgets -->
   <div class="section-header">
@@ -62,7 +108,7 @@
     </div>
   </div>
 
-  <div class="trip-budget-list">
+  <section class="trip-budget-list" aria-label="Trip budgets">
 
     <article class="trip-budget-card"
       *ngFor="let trip of budgetService.tripBudgets()">
@@ -79,7 +125,8 @@
         </span>
       </div>
 
-      <div class="progress-track">
+      <div class="progress-track" role="progressbar" [attr.aria-label]="trip.tripTitle + ' budget spent'"
+        [attr.aria-valuenow]="getPercentage(trip.spent, trip.budget)" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-fill"
           [class.over-budget-fill]="trip.spent > trip.budget"
           [style.width.%]="
@@ -129,10 +176,7 @@
     placeholder="Enter total amount"
   />
 
-  <button
-    type="button"
-    class="save-button"
-    (click)="saveSpent(trip.tripId)">
+    <button type="button" class="save-button" (click)="saveSpent(trip.tripId)">
     <span class="save-icon">✓</span>
     Save Changes
   </button>
@@ -149,7 +193,7 @@
       <p>Create your first trip to start managing your travel budget.</p>
     </div>
 
-  </div>
+  </section>
 
 </section>
 

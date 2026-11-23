@@ -21,6 +21,7 @@ export class BudgetComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   successMessage = '';
+  overallBudgetDraft = '';
 
   // Temporary values while the user is typing
   draftAmounts: Record<string, string> = {};
@@ -32,6 +33,11 @@ export class BudgetComponent implements OnInit {
           this.draftAmounts[trip.tripId] = String(trip.spent);
         });
 
+        const summary = this.budgetService.summary();
+        this.overallBudgetDraft = summary.overallBudgetIsSet
+          ? String(summary.totalBudget)
+          : '';
+
         this.isLoading = false;
       },
       error: error => {
@@ -40,6 +46,27 @@ export class BudgetComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  saveOverallBudget(): void {
+    const value = this.overallBudgetDraft.trim();
+    const amount = Number(value);
+    if (!value || !Number.isFinite(amount) || amount < 0) {
+      this.errorMessage = 'Enter a valid total budget of zero or more.';
+      this.successMessage = '';
+      return;
+    }
+
+    this.budgetService.setOverallBudget(amount);
+    this.errorMessage = '';
+    this.successMessage = 'Overall travel budget saved.';
+  }
+
+  useTripBudgetsTotal(): void {
+    this.budgetService.clearOverallBudget();
+    this.overallBudgetDraft = '';
+    this.errorMessage = '';
+    this.successMessage = 'Total budget now follows the sum of your trip budgets.';
   }
 
   setDraftAmount(tripId: string, value: string): void {

@@ -1,6 +1,5 @@
 
 .budget-page {
-  padding: 32px;
   max-width: 1400px;
   margin: 0 auto;
   color: #0f2942;
@@ -36,6 +35,210 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 40px;
+}
+
+.overall-budget {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 24px;
+  padding: 26px 28px;
+  border: 1px solid #d6e7e4;
+  border-radius: 16px;
+  background: linear-gradient(115deg, #f0fdfa 0%, #ffffff 72%);
+}
+
+.overall-copy h2 {
+  margin: 9px 0 7px;
+  color: #0f2942;
+  font-size: 22px;
+}
+
+.overall-copy p,
+.allocation-hint {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.overall-budget-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.overall-budget-form label span {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.overall-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.currency-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #64748b;
+}
+
+.currency-input:focus-within {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgb(13 148 136 / 12%);
+}
+
+.currency-input input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #0f2942;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.save-button {
+  min-height: 44px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 9px;
+  background: #0d9488;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease-out;
+}
+
+.save-button:hover {
+  background: #0f766e;
+}
+
+.use-trip-total {
+  min-height: 40px;
+  margin-top: 4px;
+  border: 0;
+  background: none;
+  color: #0d766e;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.summary-section {
+  margin-bottom: 34px;
+}
+
+.summary-section .summary-grid {
+  margin-bottom: 16px;
+}
+
+.overall-progress {
+  padding: 15px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.progress-heading strong {
+  color: #0d766e;
+  font-variant-numeric: tabular-nums;
+}
+
+.overall-progress > p {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.overall-progress.over-budget .progress-heading strong {
+  color: #b91c1c;
+}
+
+.overall-progress.over-budget .progress-fill {
+  background: #dc2626;
+}
+
+.allocation-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin-bottom: 34px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: #f1f5f9;
+}
+
+.allocation-card > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.allocation-card strong {
+  color: #0f2942;
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-card .negative,
+.allocation-warning {
+  color: #b91c1c;
+}
+
+.allocation-warning,
+.allocation-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+}
+
+.feedback {
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.success {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.loading-message {
+  margin: 16px 0;
+  color: #64748b;
 }
 
 .summary-card {
@@ -248,8 +451,10 @@
 }
 
 @media (max-width: 700px) {
-  .budget-page {
-    padding: 20px 16px;
+  .overall-budget {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 21px;
   }
 
   .summary-grid,
@@ -352,6 +557,14 @@
 
 /* Mobile */
 @media (max-width: 480px) {
+  .overall-input-row {
+    flex-direction: column;
+  }
+
+  .allocation-card {
+    grid-template-columns: 1fr;
+  }
+
   .spending-input-group {
     flex-direction: column;
   }

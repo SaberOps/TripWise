@@ -29,6 +29,15 @@
   font-size: 24px;
 }
 
+.brand-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .brand-text {
   display: flex;
   flex-direction: column;
@@ -83,6 +92,17 @@
   height: 38px;
   border-radius: 10px;
   cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.notification svg {
+  width: 19px;
+  height: 19px;
+  stroke: var(--primary);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .avatar {
@@ -107,7 +127,7 @@
   color: #64748b;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 850px) {
   .navbar {
     padding: 0 15px;
   }
@@ -119,6 +139,33 @@
 
   .brand {
     min-width: auto;
+  }
+
+  .navbar {
+    height: 68px;
+  }
+
+  .brand-text small {
+    display: none;
+  }
+
+  .navbar-actions {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .navbar {
+    gap: 8px;
+  }
+
+  .brand-text {
+    font-size: 16px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
   }
 }
 

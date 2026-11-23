@@ -3,11 +3,13 @@ import { TripService } from './trip.service';
 import { BudgetSummary, TripBudget } from '../models/budget.model';
 
 const STORAGE_KEY = 'tripwise_spending';
+const TOTAL_BUDGET_KEY = 'tripwise_total_budget';
 
 @Injectable({ providedIn: 'root' })
 export class BudgetService {
   private readonly tripService = inject(TripService);
   private readonly spending = signal<Record<string, number>>(this.loadSpending());
+  private readonly overallBudget = signal<number | null>(this.loadOverallBudget());
 
   readonly tripBudgets = computed<TripBudget[]>(() =>
     this.tripService.tripsList().map(trip => ({
@@ -20,16 +22,51 @@ export class BudgetService {
 
   readonly summary = computed<BudgetSummary>(() => {
     const budgets = this.tripBudgets();
-    const totalBudget = budgets.reduce((sum, trip) => sum + trip.budget, 0);
+    const allocatedBudget = budgets.reduce((sum, trip) => sum + trip.budget, 0);
+    const totalBudget = this.overallBudget() ?? allocatedBudget;
     const totalSpent = budgets.reduce((sum, trip) => sum + trip.spent, 0);
 
     return {
       totalBudget,
+      allocatedBudget,
+      unallocatedBudget: totalBudget - allocatedBudget,
       totalSpent,
       remainingBudget: totalBudget - totalSpent,
-      tripsCount: budgets.length
+      tripsCount: budgets.length,
+      overallBudgetIsSet: this.overallBudget() !== null
     };
   });
+
+  private loadOverallBudget(): number | null {
+    try {
+      const stored = localStorage.getItem(TOTAL_BUDGET_KEY);
+      if (stored === null) return null;
+      const amount = Number(stored);
+      return Number.isFinite(amount) && amount >= 0 ? amount : null;
+    } catch (error) {
+      console.error('Could not load overall budget:', error);
+      return null;
+    }
+  }
+
+  setOverallBudget(amount: number): void {
+    if (!Number.isFinite(amount) || amount < 0) return;
+    this.overallBudget.set(amount);
+    try {
+      localStorage.setItem(TOTAL_BUDGET_KEY, String(amount));
+    } catch (error) {
+      console.error('Could not save overall budget:', error);
+    }
+  }
+
+  clearOverallBudget(): void {
+    this.overallBudget.set(null);
+    try {
+      localStorage.removeItem(TOTAL_BUDGET_KEY);
+    } catch (error) {
+      console.error('Could not clear overall budget:', error);
+    }
+  }
 
   private loadSpending(): Record<string, number> {
     try {

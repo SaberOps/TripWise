@@ -1,10 +1,9 @@
-
 .sidebar {
   width: 245px;
   min-width: 245px;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  padding: 30px 17px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -18,38 +17,57 @@
   margin: 0 0 15px 12px;
 }
 
+.menu-items {
+  display: grid;
+  gap: 5px;
+}
+
 .menu-item {
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 13px 12px;
-  margin-bottom: 6px;
+  min-height: 44px;
+  padding: 10px 12px;
   border-radius: 9px;
   font-size: 13px;
   font-weight: 500;
-  color: #64748b;
-  transition: 0.2s;
+  color: var(--muted);
+  transition: background-color 160ms ease-out, color 160ms ease-out;
 }
 
-.menu-item span {
-  font-size: 19px;
-  width: 22px;
-  text-align: center;
+.menu-icon {
+  display: grid;
+  flex: 0 0 22px;
+  place-items: center;
+}
+
+.menu-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .menu-item:hover {
   background: #f0fdfa;
-  color: #0d9488;
+  color: #0d766f;
 }
 
 .menu-item.active {
-  background: #ccfbf1;
-  color: #0d9488;
+  background: var(--mint);
+  color: #0d766f;
   font-weight: 700;
 }
 
+.menu-item:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .travel-tip {
-  background: #0f2942;
+  background: var(--primary);
   color: white;
   padding: 18px;
   border-radius: 12px;
@@ -74,19 +92,46 @@
 
 @media (max-width: 700px) {
   .sidebar {
-    width: 65px;
-    min-width: 65px;
-    padding: 20px 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
   }
 
   .section-title,
-  .menu-item:not(span),
   .travel-tip {
-    font-size: 0;
+    display: none;
+  }
+
+  .menu-items {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .menu-item {
+    min-height: 58px;
+    flex-direction: column;
     justify-content: center;
-    padding: 12px 5px;
+    gap: 3px;
+    padding: 5px 2px;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .menu-icon {
+    flex-basis: auto;
+  }
+
+  .menu-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-item {
+    transition: none;
   }
 }
