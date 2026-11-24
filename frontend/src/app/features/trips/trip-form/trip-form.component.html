@@ -46,17 +46,80 @@
           }
         </div>
 
-        <div class="form-group">
-          <label for="startDate">Start date *</label>
-          <input id="startDate" type="date" formControlName="startDate" />
+        <div class="form-group date-form-group">
+          <label id="start-date-label">Start date *</label>
+          <input id="startDate" class="visually-hidden" type="date" formControlName="startDate" aria-hidden="true" tabindex="-1" />
+          <button type="button" class="date-trigger" aria-labelledby="start-date-label start-date-value"
+            aria-haspopup="dialog" [attr.aria-expanded]="calendarField === 'startDate'"
+            (click)="openCalendar('startDate')">
+            <span class="date-trigger-icon" aria-hidden="true">▦</span>
+            <span id="start-date-value" [class.date-placeholder]="!tripForm.controls.startDate.value">
+              {{ formatDate(tripForm.controls.startDate.value) }}
+            </span>
+            <span class="date-trigger-hint">Select date</span>
+          </button>
+          @if (calendarField === 'startDate') {
+            <div class="date-picker" role="dialog" aria-label="Choose trip start date" (keydown)="handleCalendarKeydown($event)">
+              <div class="calendar-header">
+                <button type="button" class="month-nav" aria-label="Previous month" (click)="moveCalendarMonth(-1)">‹</button>
+                <h2 aria-live="polite">{{ calendarMonthLabel }}</h2>
+                <button type="button" class="month-nav" aria-label="Next month" (click)="moveCalendarMonth(1)">›</button>
+              </div>
+              <div class="calendar-grid calendar-weekdays" aria-hidden="true">
+                @for (weekday of weekdays; track weekday) { <span>{{ weekday }}</span> }
+              </div>
+              <div class="calendar-grid calendar-days" role="grid" aria-label="Calendar dates">
+                @for (day of calendarDays; track day.isoDate) {
+                  <button type="button" role="gridcell" class="calendar-day"
+                    [class.outside-month]="!day.inDisplayedMonth" [class.today]="day.today"
+                    [class.selected]="day.selected" [attr.aria-selected]="day.selected"
+                    [attr.aria-label]="formatDate(day.isoDate)" (click)="selectCalendarDate(day)">
+                    {{ day.day }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
           @if (tripForm.get('startDate')?.touched && tripForm.get('startDate')?.invalid) {
             <small class="error">Start date is required.</small>
           }
         </div>
 
-        <div class="form-group">
-          <label for="endDate">End date *</label>
-          <input id="endDate" type="date" formControlName="endDate" />
+        <div class="form-group date-form-group">
+          <label id="end-date-label">End date *</label>
+          <input id="endDate" class="visually-hidden" type="date" formControlName="endDate" aria-hidden="true" tabindex="-1" />
+          <button type="button" class="date-trigger" aria-labelledby="end-date-label end-date-value"
+            aria-haspopup="dialog" [attr.aria-expanded]="calendarField === 'endDate'"
+            (click)="openCalendar('endDate')">
+            <span class="date-trigger-icon" aria-hidden="true">▦</span>
+            <span id="end-date-value" [class.date-placeholder]="!tripForm.controls.endDate.value">
+              {{ formatDate(tripForm.controls.endDate.value) }}
+            </span>
+            <span class="date-trigger-hint">Select date</span>
+          </button>
+          @if (calendarField === 'endDate') {
+            <div class="date-picker" role="dialog" aria-label="Choose trip end date" (keydown)="handleCalendarKeydown($event)">
+              <div class="calendar-header">
+                <button type="button" class="month-nav" aria-label="Previous month" (click)="moveCalendarMonth(-1)">‹</button>
+                <h2 aria-live="polite">{{ calendarMonthLabel }}</h2>
+                <button type="button" class="month-nav" aria-label="Next month" (click)="moveCalendarMonth(1)">›</button>
+              </div>
+              <div class="calendar-grid calendar-weekdays" aria-hidden="true">
+                @for (weekday of weekdays; track weekday) { <span>{{ weekday }}</span> }
+              </div>
+              <div class="calendar-grid calendar-days" role="grid" aria-label="Calendar dates">
+                @for (day of calendarDays; track day.isoDate) {
+                  <button type="button" role="gridcell" class="calendar-day"
+                    [class.outside-month]="!day.inDisplayedMonth" [class.today]="day.today"
+                    [class.selected]="day.selected" [disabled]="day.disabled"
+                    [attr.aria-selected]="day.selected" [attr.aria-label]="formatDate(day.isoDate)"
+                    (click)="selectCalendarDate(day)">
+                    {{ day.day }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
           @if (tripForm.get('endDate')?.touched && tripForm.get('endDate')?.invalid) {
             <small class="error">End date is required.</small>
           }

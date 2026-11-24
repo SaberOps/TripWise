@@ -13,6 +13,17 @@ import { TripStatus } from '../../../core/models/trip.model';
 import { DestinationService } from '../../../core/services/destination.service';
 import { TripService } from '../../../core/services/trip.service';
 
+type DateField = 'startDate' | 'endDate';
+
+interface CalendarDay {
+  isoDate: string;
+  day: number;
+  inDisplayedMonth: boolean;
+  disabled: boolean;
+  today: boolean;
+  selected: boolean;
+}
+
 function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
   const startDate = control.get('startDate')?.value;
   const endDate = control.get('endDate')?.value;
@@ -41,6 +52,10 @@ export class TripFormComponent implements OnInit {
   isLoading = true;
   isSaving = false;
   errorMessage = '';
+  calendarField: DateField | null = null;
+  calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  calendarDays: CalendarDay[] = [];
+  readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   tripForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -54,6 +69,7 @@ export class TripFormComponent implements OnInit {
   }, { validators: dateRangeValidator });
 
   ngOnInit(): void {
+    this.updateCalendarDays();
     this.tripId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.tripId;
 
@@ -72,6 +88,99 @@ export class TripFormComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  openCalendar(field: DateField): void {
+    this.calendarField = this.calendarField === field ? null : field;
+    const selectedDate = this.parseDate(this.tripForm.controls[field].value);
+    const dateToShow = selectedDate ?? this.parseDate(
+      field === 'endDate' ? this.tripForm.controls.startDate.value : ''
+    ) ?? new Date();
+    this.calendarMonth = new Date(dateToShow.getFullYear(), dateToShow.getMonth(), 1);
+    this.updateCalendarDays();
+  }
+
+  moveCalendarMonth(offset: number): void {
+    this.calendarMonth = new Date(
+      this.calendarMonth.getFullYear(),
+      this.calendarMonth.getMonth() + offset,
+      1
+    );
+    this.updateCalendarDays();
+  }
+
+  selectCalendarDate(day: CalendarDay): void {
+    if (day.disabled || !this.calendarField) return;
+
+    if (this.calendarField === 'startDate') {
+      const endDate = this.tripForm.controls.endDate.value;
+      this.tripForm.controls.startDate.setValue(day.isoDate);
+      if (endDate && endDate < day.isoDate) {
+        this.tripForm.controls.endDate.setValue('');
+        this.tripForm.controls.endDate.markAsUntouched();
+      }
+    } else {
+      this.tripForm.controls.endDate.setValue(day.isoDate);
+    }
+
+    this.tripForm.controls[this.calendarField].markAsTouched();
+    this.calendarField = null;
+    this.updateCalendarDays();
+  }
+
+  formatDate(value: string | null | undefined): string {
+    const date = this.parseDate(value);
+    return date
+      ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(date)
+      : 'Choose a date';
+  }
+
+  get calendarMonthLabel(): string {
+    return new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(this.calendarMonth);
+  }
+
+  handleCalendarKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') this.calendarField = null;
+  }
+
+  private updateCalendarDays(): void {
+    const year = this.calendarMonth.getFullYear();
+    const month = this.calendarMonth.getMonth();
+    const first = new Date(year, month, 1);
+    const mondayOffset = (first.getDay() + 6) % 7;
+    const start = new Date(year, month, 1 - mondayOffset);
+    const today = this.toIsoDate(new Date());
+    const selected = this.calendarField
+      ? this.tripForm.controls[this.calendarField].value
+      : '';
+    const earliestEndDate = this.tripForm.controls.startDate.value;
+
+    this.calendarDays = Array.from({ length: 42 }, (_, index) => {
+      const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + index);
+      const isoDate = this.toIsoDate(date);
+      return {
+        isoDate,
+        day: date.getDate(),
+        inDisplayedMonth: date.getMonth() === month,
+        disabled: this.calendarField === 'endDate' && !!earliestEndDate && isoDate < earliestEndDate,
+        today: isoDate === today,
+        selected: isoDate === selected
+      };
+    });
+  }
+
+  private parseDate(value: string | null | undefined): Date | null {
+    if (!value) return null;
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return null;
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  private toIsoDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private loadTrip(id: string): void {

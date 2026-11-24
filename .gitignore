@@ -44,3 +44,6 @@ temp/
 #presentation and report
 presentation/
 report/
+#agent skills
+.agents/
+AGENTS.md

@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "skills": {
+    "docker-build-strategies": {
+      "source": "docker/skills",
+      "commit": "8839ca12564ee5429927083ad638744007d539e9",
+      "sourceType": "github",
+      "skillPath": "skills/docker-build-strategies/SKILL.md",
+      "computedHash": "a9cc5c3839d60ec8e7ca390292e1d4784bc69cf962413cb17364e7b5a46783e1"
+    },
+    "docker-compose-patterns": {
+      "source": "docker/skills",
+      "commit": "8839ca12564ee5429927083ad638744007d539e9",
+      "sourceType": "github",
+      "skillPath": "skills/docker-compose-patterns/SKILL.md",
+      "computedHash": "fd752b44e789bbf42f8c0edd92df89c84871d46aee92785230e5260f866e8f99"
+    },
+    "express": {
+      "source": "full-stack-skills/nodejs-skills",
+      "commit": "7124d2c36b96a3a730754bba5f02dc6619125ae6",
+      "sourceType": "github",
+      "skillPath": "skills/express/SKILL.md",
+      "computedHash": "da18ebc425d5e60bfdc69390956d0ab1207a4316f030d4152d80a7573c21b148"
+    },
+    "frontend-design": {
+      "source": "nexu-io/open-design",
+      "commit": "5fdcc3db1e31bd4fa70f673041b78e87977507c3",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "710aba8e87cc6f77fdc672c82d26c54c01e4332305d56f17ca3d27bdf627438c"
+    },
+    "security-best-practices": {
+      "source": "openai/skills",
+      "commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/security-best-practices/SKILL.md",
+      "computedHash": "f3a018deca655724357a5576d36026b78f174a97094d42d3ef5f7ff08c9c1f27"
+    },
+    "ui-ux": {
+      "source": "notmehul/skills",
+      "commit": "c2eaac99e5de3c861e3b31620bc646059c5e479e",
+      "sourceType": "github",
+      "skillPath": "skills/ui-ux/SKILL.md",
+      "computedHash": "64d9cead99ce14bc7412ebf9dc242b293ca51dd69ce601b6b691f604a91ace46"
+    }
+  }
+}
